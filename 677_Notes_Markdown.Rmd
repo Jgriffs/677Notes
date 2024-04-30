@@ -15,6 +15,25 @@ knitr::opts_chunk$set(echo = TRUE)
 suppressPackageStartupMessages(library(ggplot2))
 ```
 
+Following page 120, the following variables/conditions exist:
+
+States of nature:
+$\theta_1$ = "Today is a sunny day."
+$\theta_2$ = "Today is a rainy day."
+
+Available actions:
+$\alpha_1$ = "Wear fair-weather outfit."
+$\alpha_2$ = "Wear outfit with raincoat."
+$\alpha_3$ = "Wear outfit with raincoat, boots, rain hat, and umbrella."
+
+Table 5.1
+
+|                   |$\alpha_1$|$\alpha_2$|$\alpha_3$|
+|-------------------|----------|----------|----------|
+|$\theta_1$(no rain)|0         |1         |3         |
+|$\theta_2$(rain)   |5         |3         |2         |
+
+
 #Data
 ```{r}
 
