@@ -1,6 +1,6 @@
 ---
 title: "677_Notes_Quarto"
-author: "Joe"
+author: "Joe Griffiths"
 format: html
 editor: visual
 ---
@@ -68,7 +68,6 @@ remove(sigma_one,sigma_two,x_1,x_2,x_3,Strategy)
 ```
 
 ```{r}
-
 # dfs used to assemble action tables--------------------------------------
 a1_count <- function(column){a <- str_count(column,"a1")}
 a1_df <- as.data.frame(lapply(Strategy_Table[,2:4],a1_count))
@@ -136,7 +135,15 @@ Plot_Loss
 
 ```
 
-As shown above, admissible strategies (colored blue) 
+
+As shown above, *admissible* strategies (colored blue) sit at the bottom edge of all of the strategies (designated by points on the graph). A strategy is *inadmissible* if another strategy offers a lower expected loss of utility for any possible state. For example, strategy 4 (top left) is inadmissible because in the event that state 1 or state 2 is the true state of nature, then strategy 2 would offer smaller expected losses of utility in either state. In this scenario, strategy 2 *dominates* strategy 4 since it is preferable in both states. Although strategy 2 offers a lower expected loss of utility than strategy 1 in the event of state 2 being the true state of nature, strategy 1 is expected to have a smaller loss of utility in the event that state 1 is the true state of nature. Since strategy 1 is not dominated by any other state, it is therefore *admissible* . 
+
+```{r}
+knitr::include_graphics("C:/Users/Joe/Desktop/677 Found Stats/677 Final/677Notes/Expected Loss Shaded.png") #when clicking on image under files, open option that says "copy path" and paste into quotes
+```
+
+As noted in Figure 5.2 (pg. 126), the set of points, including the admissible ones, with that house all of the points representing strategies forms a *convex* set, holding all *pure* strategies. According to Chernoff and Moses (1959), a *pure* strategy "assigns an action to each of the possible observations".
+
 
 # Book Exercises
 
@@ -188,3 +195,8 @@ If Mr.Nelson replaced his weather meter by a crustal ball which told him the sta
 
 ```
 
+
+
+# Reference
+
+$1$ Chernoff, H., & Moses, L. E. (1959). Elementary decision theory. John Wiley
