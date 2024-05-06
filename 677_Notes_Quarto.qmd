@@ -136,6 +136,8 @@ Plot_Loss
 
 ```
 
+As shown above, admissible strategies (colored blue) 
+
 # Book Exercises
 
 These are exercises listed under Table 5.5 on pg 123.
