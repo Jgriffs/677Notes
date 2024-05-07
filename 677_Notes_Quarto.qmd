@@ -12,17 +12,18 @@ knitr::opts_chunk$set(echo = TRUE)
 The following are notes for Chapter 5 of *Elementary Decision Making*, titled "Uncertainty due to Ignorance of the State of Nature".
 
 # Libraries
-
 ```{r warning=FALSE}
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(tidyverse))
 ```
 
-*Expected loss* is a key concept in decision theory, used to quantify some amount of utility that is lost as a result of a certain action. Chapter 5 of Chernoff & Moses touches on this concept, though not in a strictly game theory context.
+*Expected loss* is a key concept in decision theory, used to quantify some amount of utility that is lost as a result of a certain action. Chapter 5 of Chernoff & Moses touches on this concept of expected loss of utility $L(\theta,s)$.
 
 # Data
 
-First, some data from the tables featured in Chapter 5 will be created.
+To find the expected losses of strategies featured in the main example in the chapter, some of the tables need to be created.
+
+## Table 5.1
 
 Following page 120, the following variables/conditions exist:
   
@@ -37,9 +38,12 @@ Available actions: $\alpha_1$ = "Wear fair-weather outfit." $\alpha_2$ = "Wear o
   | $\theta_1$ (no rain) | 0          | 1          | 3          |
   | $\theta_2$ (rain)    | 5          | 3          | 2          |
   
-  ## Tables
-  
-```{r Original Tables}
+## Tables
+The following code creates additional tables featured in the chapter.
+
+### Chapter Tables
+
+```{r Chapter Tables}
 ## Mr. Nelson's Loss of Utility l(sigma,alpha) from (pg. 120,table 5.1)
 sigma_one <- c(0,1,3)
 sigma_two <- c(5,3,2)
@@ -60,9 +64,15 @@ x_3 <- rep(c("a1","a2","a3"),9)
 Strategy_Table <- data.frame(Strategy,x_1,x_2,x_3)
 
 remove(sigma_one,sigma_two,x_1,x_2,x_3,Strategy)
+
+Loss_table
+Weather_table
+Strategy_Table
 ```
 
-```{r}
+Action tables, as featured in the chapter, were created in order to calculate expected values according to $\theta_1$ and $\theta_2$.
+
+```{r functions}
 # dfs used to assemble action tables--------------------------------------
 a1_count <- function(column){a <- str_count(column,"a1")}
 a1_df <- as.data.frame(lapply(Strategy_Table[,2:4],a1_count))
@@ -84,7 +94,12 @@ a3_df <- as.matrix(a3_df)
 tA1 <- t(a1_df %*% tw)
 tA2 <- t(a2_df %*% tw)
 tA3 <- t(a3_df %*% tw)
+```
 
+I then created a function to calculate the expected loss for any given strategy $s_n$ for both possible states $\theta_1$ and $\theta_2$.
+
+### Expected Loss function
+```{r Function}
 EL_calc <- function(strategy){ ### for any strategy 1-27, calculates the EL for sit. 1 and 2
   Action_Probability_Table <- data.frame(p_action1 = tA1[,strategy],
                                          p_action2 = tA2[,strategy],
@@ -93,23 +108,31 @@ EL_calc <- function(strategy){ ### for any strategy 1-27, calculates the EL for 
   EL <- Action_Probability_Table[,4]
   EL
 }
+```
 
+This function takes the product of the loss of utility for each action $\alpha$ for Mr. Nelson and the probability of each action given the state of nature $P(\alpha | \theta)$ .
+
+### Loss of Utility table
+```{r More tables}
 # Table 5.4
 Loss_of_Utility_Table <- as.data.frame(lapply(1:27, EL_calc))
 rownames(Loss_of_Utility_Table) <- c("theta_one","theta_two")
 colnames(Loss_of_Utility_Table) <- c(1:27)
-
 
 ### setting up table for plot
 Loss_of_Utility_Table_Trans <- as.data.frame(t(Loss_of_Utility_Table)) |> 
   rename(EL_Theta_One=theta_one,EL_Theta_Two=theta_two) |> 
   mutate(StrategyNumber = 1:27)
 row.names(Loss_of_Utility_Table_Trans) <- 1:27
+```
 
+The chapter features a few plots and elaborates on *Admissible strategies*. 
+
+## Plots
+```{r Plots}
 Admissible_Strategies <- Loss_of_Utility_Table_Trans[c(1,2,5,6,9,15,18,27),]
 
 Loss_of_Utility_Table_Trans$Admissible <- as.factor(ifelse(Loss_of_Utility_Table_Trans$StrategyNumber %in% Admissible_Strategies$StrategyNumber,"Yes","No"))
-
 
 Plot_Loss <- ggplot(Loss_of_Utility_Table_Trans,aes(EL_Theta_One,EL_Theta_Two))+
   geom_point(aes(color=Admissible))+
@@ -127,19 +150,17 @@ Plot_Loss <- ggplot(Loss_of_Utility_Table_Trans,aes(EL_Theta_One,EL_Theta_Two))+
 
 Loss_of_Utility_Table
 Plot_Loss
-
-
 ```
 
+As shown above, *admissible* strategies (colored blue) sit at the bottom edge of all of the strategies (designated by points on the graph). A strategy is *inadmissible* if another strategy offers a lower expected loss of utility for any possible state. For example, strategy 4 (top left) is inadmissible because in the event that state 1 or state 2 is the true state of nature, then strategy 2 would offer smaller expected losses of utility in either state. In this scenario, strategy 2 *dominates* strategy 4 since it is preferable in both states. Although strategy 2 offers a lower expected loss of utility than strategy 1 in the event of state 2 being the true state of nature, strategy 1 is expected to have a smaller loss of utility in the event that state 1 is the true state of nature. Since strategy 1 is not dominated by any other state, it is therefore *admissible*. I created an additional column in the dataframe of strategies that designates whether a strategy is admissible in order to distinguish it in the figure (blue = admissible). 
 
-As shown above, *admissible* strategies (colored blue) sit at the bottom edge of all of the strategies (designated by points on the graph). A strategy is *inadmissible* if another strategy offers a lower expected loss of utility for any possible state. For example, strategy 4 (top left) is inadmissible because in the event that state 1 or state 2 is the true state of nature, then strategy 2 would offer smaller expected losses of utility in either state. In this scenario, strategy 2 *dominates* strategy 4 since it is preferable in both states. Although strategy 2 offers a lower expected loss of utility than strategy 1 in the event of state 2 being the true state of nature, strategy 1 is expected to have a smaller loss of utility in the event that state 1 is the true state of nature. Since strategy 1 is not dominated by any other state, it is therefore *admissible* . 
+Miller & Miller reference *dominant* strategies in Chapter 9 of *John E. Freund's mathematical statistics with applications*, titled "Decision Theory". In contrast to Chernoff, H., & Moses' example of Mr.Nelson, their examples detail two players who each have their own strategy. Thus, instead of having a table of strategies $s_1,s_2,...s_n$ by states $\theta_1,\theta_2,...\theta_n$, the table resembles a strategy by strategy table, which has implications for optimal decison making.
 
 ```{r}
 knitr::include_graphics("C:/Users/Joe/Desktop/677 Found Stats/677 Final/677Notes/Expected Loss Shaded.png") #when clicking on image under files, open option that says "copy path" and paste into quotes
 ```
 
 As noted in Figure 5.2 (pg. 126), the set of points, including the admissible ones, with that house all of the points representing strategies forms a *convex* set, holding all *pure* strategies. According to Chernoff and Moses (1959), a *pure* strategy "assigns an action to each of the possible observations".
-
 
 Below is an application of the expected loss function, which is used to give an answer for exercise 5.1.
 
@@ -155,26 +176,16 @@ strategy <- 10
 Action_Probability_Table <- data.frame(p_action1 = tA1[,strategy],
                                        p_action2 = tA2[,strategy],
                                        p_action3 = tA3[,strategy])*Loss_table
-
 Action_Probability_Table
 ```
 
 Using the function created above, titled "EL_calc", I am able to enter in a strategy from the table and have an output that represents the expected loss of utility for state 1 and state 2. Using these two values, I am able to perform matrix multiplication with the loss of utility table (pg. 120, table 5.1) to find the losses of strategy 10.
 
-
-**Bayes Strategy**
-5.6: $L(s)=(1-w)L(\theta_1,s)+wL(\theta_2,s)$
-  
-## Bayes Strategy Function
-```{r}
-
-```
-
-
+Given a different loss of utility table, probability of state table, and strategy table, one could modify the expected loss function created above to come up with solutions to other problems involving uncertainty due to nature. 
 
 # Reference
 
-$1$ Chernoff, H., & Moses, L. E. (1959). Elementary decision theory. John Wiley
+$1$ Chernoff, H., & Moses, L. E. (1959). Elementary decision theory. Chapter 5.
 
 $2$ Miller, J. (1999). John E. Freund's mathematical statistics. Chapter 9.
 
