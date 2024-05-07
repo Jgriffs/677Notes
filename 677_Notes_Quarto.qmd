@@ -4,14 +4,7 @@ author: "Joe Griffiths"
 format: html
 editor: visual
 ---
-
----
-title: "677 Final"
-author: "Joe Griffiths"
-date: "`r Sys.Date()`"
-output: pdf_document
----
-
+  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -25,25 +18,27 @@ suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(tidyverse))
 ```
 
+*Expected loss* is a key concept in decision theory, used to quantify some amount of utility that is lost as a result of a certain action. Chapter 5 of Chernoff & Moses touches on this concept, though not in a strictly game theory context.
+
 # Data
 
-First, the data from the tables featured will be created.
+First, some data from the tables featured in Chapter 5 will be created.
 
 Following page 120, the following variables/conditions exist:
-
-States of nature: $\theta_1$ = "Today is a sunny day." $\theta_2$ = "Today is a rainy day."
+  
+  States of nature: $\theta_1$ = "Today is a sunny day." $\theta_2$ = "Today is a rainy day."
 
 Available actions: $\alpha_1$ = "Wear fair-weather outfit." $\alpha_2$ = "Wear outfit with raincoat." $\alpha_3$ = "Wear outfit with raincoat, boots, rain hat, and umbrella."
 
 **Table 5.1**
-
-|                      | $\alpha_1$ | $\alpha_2$ | $\alpha_3$ |
-|----------------------|------------|------------|------------|
-| $\theta_1$ (no rain) | 0          | 1          | 3          |
-| $\theta_2$ (rain)    | 5          | 3          | 2          |
-
-## Tables
-
+  
+  |                      | $\alpha_1$ | $\alpha_2$ | $\alpha_3$ |
+  |----------------------|------------|------------|------------|
+  | $\theta_1$ (no rain) | 0          | 1          | 3          |
+  | $\theta_2$ (rain)    | 5          | 3          | 2          |
+  
+  ## Tables
+  
 ```{r Original Tables}
 ## Mr. Nelson's Loss of Utility l(sigma,alpha) from (pg. 120,table 5.1)
 sigma_one <- c(0,1,3)
@@ -92,8 +87,8 @@ tA3 <- t(a3_df %*% tw)
 
 EL_calc <- function(strategy){ ### for any strategy 1-27, calculates the EL for sit. 1 and 2
   Action_Probability_Table <- data.frame(p_action1 = tA1[,strategy],
-                            p_action2 = tA2[,strategy],
-                            p_action3 = tA3[,strategy])*Loss_table
+                                         p_action2 = tA2[,strategy],
+                                         p_action3 = tA3[,strategy])*Loss_table
   Action_Probability_Table$EL <- rowSums(Action_Probability_Table)
   EL <- Action_Probability_Table[,4]
   EL
@@ -102,7 +97,7 @@ EL_calc <- function(strategy){ ### for any strategy 1-27, calculates the EL for 
 # Table 5.4
 Loss_of_Utility_Table <- as.data.frame(lapply(1:27, EL_calc))
 rownames(Loss_of_Utility_Table) <- c("theta_one","theta_two")
-colnames(Loss_of_Utility_Table) <- 
+colnames(Loss_of_Utility_Table) <- c(1:27)
 
 
 ### setting up table for plot
@@ -130,6 +125,7 @@ Plot_Loss <- ggplot(Loss_of_Utility_Table_Trans,aes(EL_Theta_One,EL_Theta_Two))+
   theme_light()
 # help from https://r-graph-gallery.com/275-add-text-labels-with-ggplot2.html
 
+Loss_of_Utility_Table
 Plot_Loss
 
 
@@ -145,13 +141,9 @@ knitr::include_graphics("C:/Users/Joe/Desktop/677 Found Stats/677 Final/677Notes
 As noted in Figure 5.2 (pg. 126), the set of points, including the admissible ones, with that house all of the points representing strategies forms a *convex* set, holding all *pure* strategies. According to Chernoff and Moses (1959), a *pure* strategy "assigns an action to each of the possible observations".
 
 
-# Book Exercises
+Below is an application of the expected loss function, which is used to give an answer for exercise 5.1.
 
-These are exercises listed under Table 5.5 on pg 123.
-
-## 5.1
-
-Compute the action probabilities and losses for strategy $s_{10}$.
+"Compute the action probabilities and losses for strategy $s_{10}$."
 
 ```{r 5.1}
 #using function above
@@ -161,35 +153,18 @@ strategy <- 10
 
 #pasted from first part in function above
 Action_Probability_Table <- data.frame(p_action1 = tA1[,strategy],
-                            p_action2 = tA2[,strategy],
-                            p_action3 = tA3[,strategy])*Loss_table
-  
+                                       p_action2 = tA2[,strategy],
+                                       p_action3 = tA3[,strategy])*Loss_table
+
 Action_Probability_Table
 ```
 
-## 5.2
+Using the function created above, titled "EL_calc", I am able to enter in a strategy from the table and have an output that represents the expected loss of utility for state 1 and state 2. Using these two values, I am able to perform matrix multiplication with the loss of utility table (pg. 120, table 5.1) to find the losses of strategy 10.
 
-Use the table of random digits to select an observation according to the probabilities corresponding to $\theta_1$. Apply $s_{10}$ to this observation and list the corresponding action and loss. Repeat ten times and average the ten losses.
-
-```{r 5.2}
-#??
-ran_digits <- runif(10,min=10,max=100) |> round()
-
-```
-
-## 5.3
-
-If Mr.Nelson replaced his weather meter by a crustal ball which told him the state of nature, $\theta$, reasonable use of this information would provide him with *ideal action probabilities*. Present this table of ideal action probabilities. These are called ideal because with ordinary information no strategy could do this well.
-
-```{r 5.3}
-#just rounded all the prob tables?
-```
-
-# Equations
 
 **Bayes Strategy**
 5.6: $L(s)=(1-w)L(\theta_1,s)+wL(\theta_2,s)$
-
+  
 ## Bayes Strategy Function
 ```{r}
 
@@ -200,3 +175,6 @@ If Mr.Nelson replaced his weather meter by a crustal ball which told him the sta
 # Reference
 
 $1$ Chernoff, H., & Moses, L. E. (1959). Elementary decision theory. John Wiley
+
+$2$ Miller, J. (1999). John E. Freund's mathematical statistics. Chapter 9.
+
