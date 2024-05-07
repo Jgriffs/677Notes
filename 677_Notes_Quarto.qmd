@@ -9,6 +9,7 @@ editor: visual
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
 The following are notes for Chapter 5 of *Elementary Decision Making*, titled "Uncertainty due to Ignorance of the State of Nature".
 
 # Libraries
